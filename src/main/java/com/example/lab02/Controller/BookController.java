@@ -3,56 +3,55 @@ package com.example.lab02.Controller;
 import com.example.lab02.Service.BookService;
 import com.example.lab02.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
-@RestController
-@RequestMapping("/api/books")
+@Controller
+@RequestMapping("/books")
 public class BookController {
 
     @Autowired
     private BookService bookService;
 
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> books = bookService.getAllBooks();
-        return ResponseEntity.ok(books);
+    public String listBooks(Model model) {
+        model.addAttribute("books", bookService.getAllBooks());
+        return "books";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable int id) {
-        Optional<Book> book = bookService.getBookById(id);
-        if (book.isPresent()) {
-            return ResponseEntity.ok(book.get());
-        }
-        return ResponseEntity.notFound().build();
+    // Hiển thị form thêm sách
+    @GetMapping("/add")
+    public String addBookForm(Model model) {
+        model.addAttribute("book", new Book());
+        return "add-book";
     }
 
-    @PostMapping
-    public ResponseEntity<Book> addBook(@RequestBody Book book) {
-        Book newBook = bookService.addBook(book);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newBook);
+    // Thêm sách mới
+    @PostMapping("/add")
+    public String addBook(@ModelAttribute Book book) {
+        bookService.addBook(book);
+        return "redirect:/books";
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable int id, @RequestBody Book book) {
-        Optional<Book> updatedBook = bookService.updateBook(id, book);
-        if (updatedBook.isPresent()) {
-            return ResponseEntity.ok(updatedBook.get());
-        }
-        return ResponseEntity.notFound().build();
+    // Hiển thị form sửa sách
+    @GetMapping("/edit/{id}")
+    public String editBookForm(@PathVariable Long id, Model model) {
+        bookService.getBookById(id).ifPresent(book -> model.addAttribute("book", book));
+        return "edit-book";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable int id) {
-        boolean deleted = bookService.deleteBook(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    // Cập nhật sách
+    @PostMapping("/edit")
+    public String updateBook(@ModelAttribute Book book) {
+        bookService.updateBook(book);
+        return "redirect:/books";
+    }
+
+    // Xóa sách
+    @GetMapping("/delete/{id}")
+    public String deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return "redirect:/books";
     }
 }
