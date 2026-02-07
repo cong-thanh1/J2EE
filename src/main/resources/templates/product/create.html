@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Thêm Sản phẩm</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="bi bi-plus-circle"></i> Thêm Sản phẩm mới
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Error Message -->
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="@{/products/create}" 
+                                  th:object="${product}" 
+                                  method="post" 
+                                  enctype="multipart/form-data">
+                                
+                                <!-- Product Name -->
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">
+                                        Tên sản phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="name" 
+                                           th:field="*{name}"
+                                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                                    <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback">
+                                        <span th:errors="*{name}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">
+                                        Giá sản phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" 
+                                               class="form-control" 
+                                               id="price" 
+                                               th:field="*{price}"
+                                               min="1" 
+                                               max="9999999" 
+                                               step="0.01"
+                                               th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'">
+                                        <span class="input-group-text">đ</span>
+                                        <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback">
+                                            <span th:errors="*{price}"></span>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Giá từ 1 đến 9,999,999</small>
+                                </div>
+
+                                <!-- Category -->
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">
+                                        Danh mục <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" 
+                                            id="category" 
+                                            th:field="*{category.id}"
+                                            th:classappend="${#fields.hasErrors('category')} ? 'is-invalid'">
+                                        <option value="">-- Chọn danh mục --</option>
+                                        <option th:each="cat : ${categories}" 
+                                                th:value="${cat.id}" 
+                                                th:text="${cat.name}">
+                                        </option>
+                                    </select>
+                                    <div th:if="${#fields.hasErrors('category')}" class="invalid-feedback">
+                                        <span th:errors="*{category}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div class="mb-3">
+                                    <label for="imageProduct" class="form-label">
+                                        Hình ảnh sản phẩm
+                                    </label>
+                                    <input type="file" 
+                                           class="form-control" 
+                                           id="imageProduct" 
+                                           name="imageProduct"
+                                           accept="image/png,image/jpeg,image/jpg"
+                                           th:classappend="${#fields.hasErrors('imageFile')} ? 'is-invalid'">
+                                    <div th:if="${#fields.hasErrors('imageFile')}" class="invalid-feedback">
+                                        <span th:errors="*{imageFile}"></span>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Chỉ chấp nhận file PNG, JPG, JPEG. Tên file không quá 200 ký tự.
+                                    </small>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a th:href="@{/products}" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-left"></i> Hủy
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Thêm sản phẩm
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
